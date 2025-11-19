@@ -5,7 +5,7 @@
 #define MAX_PAGES 1000
 
 // Function Prototypes
-int simulate_FIFO(int pages[], int pageCount, int frames);
+int FIFO(int pages[], int pageCount, int frames);
 int simulate_LRU(int pages[], int pageCount, int frames);
 void print_frames(int frameArray[], int frames);
 
@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
     printf("Loaded %d page references.\n", pageCount);
 
     // Call FIFO & LRU (not implemented yet)
-    int fifo_faults = simulate_FIFO(pages, pageCount, frames);
+    int fifo_faults = FIFO(pages, pageCount, frames);
     printf("FIFO page faults: %d\n", fifo_faults);
 
     int lru_faults = simulate_LRU(pages, pageCount, frames);
@@ -57,15 +57,46 @@ int main(int argc, char *argv[]) {
 
 
 // FIFO 
-int simulate_FIFO(int pages[], int pageCount, int frames) { //Victoria
+int FIFO(int pages[], int pageCount, int frames) {
 
-    // TODO: Implement FIFO page replacement algorithm
-    // TODO: Track page faults
-    // TODO: Track final frame state
-    // TODO: Return # of page faults
+    int frameArray[MAX_FRAMES];
+    int i, j;
 
-    return 0;
+    //Set all frames as empty
+    for (i = 0; i < frames; i++) {
+        frameArray[i] = -1;  //indicator for empty
+    }
+
+    int pageFaults = 0;//variable to store page faults
+    int fifoIndex = 0;  //variable to store which frame needs to be replaced
+
+    for (i = 0; i < pageCount; i++) {//for loop to store currentPage
+        int currentPage = pages[i];
+        int found = 0;
+
+        //frame check
+        for (j = 0; j < frames; j++) {
+            if (frameArray[j] == currentPage) {
+                found = 1;
+                break;
+            }
+        }
+
+        //trigger page fault if page is not found
+        if (!found) {
+            pageFaults++;
+
+            //replace the oldest page
+            frameArray[fifoIndex] = currentPage;
+
+            //Move pointer
+            fifoIndex = (fifoIndex + 1) % frames;
+        }
+    }
+
+    return pageFaults;
 }
+
 
 
 // LRU 
@@ -87,3 +118,4 @@ void print_frames(int frameArray[], int frames) {
     // TODO: Print final frame state
 
 }
+
