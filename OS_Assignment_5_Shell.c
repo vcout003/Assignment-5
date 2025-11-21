@@ -103,19 +103,87 @@ int FIFO(int pages[], int pageCount, int frames) {
 
 int simulate_LRU(int pages[], int pageCount, int frames) { //Andy
 
-    // TODO: Implement LRU page replacement algorithm
-    // TODO: Track page faults
-    // TODO: Track final frame state
-    // TODO: Return # of page faults
+    int frameArray[MAX_FRAMES];
+    int lastUsed[MAX_FRAMES]; 
+    int time = 0;
 
-    return 0;
+    // Initialize
+    for (int i = 0; i < frames; i++) {
+        frameArray[i] = -1;
+        lastUsed[i] = -1;
+    }
+
+    int pageFaults = 0;
+
+    for (int i = 0; i < pageCount; i++) {
+
+        int currentPage = pages[i];
+        int found = -1;
+
+        // Check if page exists in frames
+        for (int j = 0; j < frames; j++) {
+            if (frameArray[j] == currentPage) {
+                found = j;
+                break;
+            }
+        }
+
+        if (found != -1) {
+            // Page hit → update last used
+            lastUsed[found] = time;
+        } else {
+            // Page fault
+            pageFaults++;
+
+            // Find empty frame first
+            int emptyIndex = -1;
+            for (int j = 0; j < frames; j++) {
+                if (frameArray[j] == -1) {
+                    emptyIndex = j;
+                    break;
+                }
+            }
+
+            if (emptyIndex != -1) {
+                // Use empty frame
+                frameArray[emptyIndex] = currentPage;
+                lastUsed[emptyIndex] = time;
+            } else {
+                // Replace LRU page
+                int lruIndex = 0;
+                for (int j = 1; j < frames; j++) {
+                    if (lastUsed[j] < lastUsed[lruIndex])
+                        lruIndex = j;
+                }
+
+                frameArray[lruIndex] = currentPage;
+                lastUsed[lruIndex] = time;
+            }
+        }
+
+        time++;
+    }
+
+    // Copy final frame state
+    for (int i = 0; i < frames; i++)
+        finalFrames[i] = frameArray[i];
+
+    return pageFaults;
+
+   
 }
 
 
 // Helper to print frame contents //Arantza + Testing/Bug Fix
 void print_frames(int frameArray[], int frames) {
 
-    // TODO: Print final frame state
-
+   for (int i = 0; i < frames; i++) {
+        if (frameArray[i] == -1)
+            printf("[ ] ");
+        else
+            printf("[%d] ", frameArray[i]);
+    }
+    printf("\n");
 }
+
 
